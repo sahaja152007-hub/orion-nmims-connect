@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Attention Optimizer</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts for Premium Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+
+    <div class="app-container">
+        <!-- Sidebar / Context Control -->
+        <aside class="sidebar">
+            <div class="brand-container" style="display: flex; align-items: center; margin-bottom: 2rem;">
+                <button class="hamburger-btn" onclick="toggleSidebar()">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <div class="brand">
+                    <span>NMIMS Connect</span>
+                </div>
+            </div>
+
+            <div class="context-panel">
+                <h3>Select Group</h3>
+                <p class="subtitle">Filter notices for your cohort.</p>
+
+                <div class="context-buttons">
+                    <button class="ctx-btn active" data-context="all" onclick="setContext('all')">
+                        <i class="fa-solid fa-globe"></i> All Campus
+                    </button>
+                    <button class="ctx-btn" data-context="year1" onclick="setContext('year1')">
+                        <i class="fa-solid fa-1"></i> 1st Year (Fresher)
+                    </button>
+                    <button class="ctx-btn" data-context="year2" onclick="setContext('year2')">
+                        <i class="fa-solid fa-2"></i> 2nd Year
+                    </button>
+                    <button class="ctx-btn" data-context="year3" onclick="setContext('year3')">
+                        <i class="fa-solid fa-3"></i> 3rd Year
+                    </button>
+                    <button class="ctx-btn" data-context="year4" onclick="setContext('year4')">
+                        <i class="fa-solid fa-4"></i> 4th Year (Grad)
+                    </button>
+                    <button class="ctx-btn" data-context="clubs" onclick="setContext('clubs')">
+                        <i class="fa-solid fa-guitar"></i> Clubs & Events
+                    </button>
+                </div>
+
+                <div class="action-panel"
+                    style="margin-top: 2rem; border-top: 1px solid var(--glass-border); padding-top: 2rem;">
+                    <button class="ctx-btn primary-action" onclick="openAddNoticeModal()">
+                        <i class="fa-solid fa-plus-circle"></i> Add Notice
+                    </button>
+                </div>
+            </div>
+
+            <div class="status-card">
+                <div class="status-icon"><i class="fa-solid fa-brain"></i></div>
+                <div class="status-info">
+                    <span id="active-context-label">All Campus</span>
+                    <small>AI filtering active</small>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Feed -->
+        <main class="feed-container">
+            <!-- Login Dashboard Header -->
+            <header class="top-bar">
+                <div class="header-search">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="search-input" placeholder="Search notices..." onkeyup="filterFeed()">
+                </div>
+                <div class="user-dashboard">
+                    <div id="login-container">
+                        <input type="text" id="school-id-input" placeholder="Enter School ID" class="login-input">
+                        <button onclick="loginUser()" class="login-btn">Login</button>
+                    </div>
+                    <div id="user-profile" style="display: none;">
+                        <span class="user-greeting">Welcome, <b id="user-id-display">Student</b></span>
+                        <div class="avatar"><i class="fa-solid fa-user"></i></div>
+                    </div>
+                </div>
+            </header>
+
+            <header class="feed-header">
+                <h1>Campus Updates</h1>
+                <div class="stats">
+                    <span id="notification-count">0</span> items relevant to you
+                </div>
+            </header>
+
+            <div id="notification-list" class="notification-list">
+                <!-- Javascript will inject cards here -->
+            </div>
+        </main>
+    </div>
+
+    <!-- Profile View (Hidden by default) -->
+    <div id="profile-view" style="display: none; padding: 2rem;">
+        <button onclick="logoutUser()" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Back to Feed</button>
+
+        <div class="profile-container">
+            <!-- ID Card Section -->
+            <div class="profile-card">
+                <div class="profile-header">
+                    <div class="profile-avatar"><i class="fa-solid fa-user-graduate"></i></div>
+                    <div class="profile-title">
+                        <h1 id="p-name">Student Name</h1>
+                        <p id="p-degree">Degree Info</p>
+                    </div>
+                </div>
+                <div class="profile-grid">
+                    <div class="info-item">
+                        <label>School ID</label>
+                        <span id="p-id">S000</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Roll No</label>
+                        <span id="p-roll">R-00-00</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Year</label>
+                        <span id="p-year">1st Year</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Mentor</label>
+                        <span id="p-mentor">Dr. Staff</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Age</label>
+                        <span id="p-age">20</span>
+                    </div>
+                    <div class="info-item">
+                        <label>CGPA</label>
+                        <span id="p-cgpa">9.0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Timetable Section -->
+            <div class="timetable-card">
+                <h3><i class="fa-regular fa-calendar-days"></i> Today's Timetable</h3>
+                <div class="timetable-list" id="p-timetable">
+                    <!-- JS will populate rows here -->
+                </div>
+            </div>
+
+            <!-- Attendance Section -->
+            <div class="attendance-card" style="grid-column: span 2;">
+                <h3><i class="fa-solid fa-clipboard-check"></i> Attendance Tracker</h3>
+                <div class="attendance-grid">
+                    <div class="overall-stat">
+                        <div class="circle-progress" id="p-overall-circle">
+                            <span id="p-overall-text">0%</span>
+                        </div>
+                        <p>Overall Attendance</p>
+                    </div>
+                    <div class="subject-attendance-list" id="p-attendance-list">
+                        <!-- JS populated -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Faculty View (Hidden by default) -->
+    <div id="faculty-view" style="display: none; padding: 2rem;">
+        <button onclick="logoutUser()" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Logout</button>
+
+        <div class="profile-container">
+            <!-- Faculty Info Card -->
+            <div class="profile-card">
+                <div class="profile-header">
+                    <div class="profile-avatar" style="background: linear-gradient(135deg, #f97316, #ea580c);"><i
+                            class="fa-solid fa-chalkboard-user"></i></div>
+                    <div class="profile-title">
+                        <h1 id="f-name">Faculty Name</h1>
+                        <p id="f-designation">Professor</p>
+                    </div>
+                </div>
+                <div class="profile-grid">
+                    <div class="info-item">
+                        <label>Faculty ID</label>
+                        <span id="f-id">F00000</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Department</label>
+                        <span id="f-dept">CS</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Email</label>
+                        <span id="f-email" style="font-size: 0.9rem;">email@nmims.edu</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Faculty Timetable -->
+            <div class="timetable-card">
+                <h3><i class="fa-regular fa-clock"></i> Today's Schedule</h3>
+                <div class="timetable-list" id="f-timetable">
+                    <!-- JS populated -->
+                </div>
+            </div>
+
+            <!-- Attendance Portal -->
+            <div class="attendance-card" style="grid-column: span 2;">
+                <h3><i class="fa-solid fa-users-viewfinder"></i> Mark Attendance</h3>
+                <div class="attendance-controls"
+                    style="margin-bottom: 2rem; display: flex; gap: 1rem; align-items: center;">
+                    <select id="class-selector" class="login-input" style="width: auto;" onchange="loadClassList()">
+                        <option value="">Select Class...</option>
+                        <!-- JS populated -->
+                    </select>
+                    <span id="class-time-hint" style="color: var(--text-muted); font-size: 0.9rem;"></span>
+                </div>
+
+                <div id="attendance-sheet" style="display: none;">
+                    <div class="sheet-header"
+                        style="display: grid; grid-template-columns: 2fr 1fr 1fr; padding: 1rem; border-bottom: 1px solid var(--glass-border); color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase;">
+                        <span>Student Name</span>
+                        <span>Roll No</span>
+                        <span>Status</span>
+                    </div>
+                    <div id="student-list" class="timetable-list" style="margin-top: 1rem;">
+                        <!-- JS populated -->
+                    </div>
+                    <button onclick="submitAttendance()" class="submit-btn" style="width: 200px; margin-top: 2rem;">Save
+                        Attendance</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Notice Modal -->
+    <div id="add-notice-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New Notice</h2>
+                <button onclick="closeAddNoticeModal()" class="close-btn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" id="notice-title" placeholder="Event Name">
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="notice-body" rows="3" placeholder="Details..."></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="text" id="notice-date" placeholder="e.g. Oct 20">
+                    </div>
+                    <div class="form-group">
+                        <label>Time</label>
+                        <input type="text" id="notice-time" placeholder="e.g. 5 PM">
+                    </div>
+                </div>
+                <!-- Links -->
+                <div class="form-group">
+                    <label>Registration Link</label>
+                    <input type="text" id="notice-reg-link" placeholder="https://forms.gle/...">
+                </div>
+                <div class="form-group">
+                    <label>Poster/Details Link</label>
+                    <input type="text" id="notice-poster-link" placeholder="https://drive.google.com/...">
+                </div>
+                <div class="form-group">
+                    <label>Target Audience</label>
+                    <select id="notice-target">
+                        <option value="year1">1st Year</option>
+                        <option value="year2">2nd Year</option>
+                        <option value="year3">3rd Year</option>
+                        <option value="year4">4th Year</option>
+                        <option value="clubs">Clubs/All</option>
+                    </select>
+                </div>
+                <button onclick="submitNotice()" class="submit-btn">Post Notice</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
