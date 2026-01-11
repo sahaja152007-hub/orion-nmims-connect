@@ -447,3 +447,154 @@ function submitAttendance() {
     document.getElementById('class-selector').value = "";
     document.getElementById('attendance-sheet').style.display = "none";
 }
+
+// ==========================================
+// AI CAMPUS ASSISTANT - GEMINI INTEGRATION
+// ==========================================
+
+const GEMINI_API_KEY = "AIzaSyD0RQGWUG7UjsPUPsfxWfVeDrB6AGf0gqI";
+const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
+
+/**
+ * Toggle AI Assistant Modal
+ */
+function toggleAIAssistant() {
+    const modal = document.getElementById('ai-modal');
+    modal.classList.toggle('active');
+    
+    if (modal.classList.contains('active')) {
+        document.getElementById('ai-input').focus();
+    }
+}
+
+/**
+ * Handle Enter key press in AI input
+ */
+function handleAIKeyPress(event) {
+    if (event.key === 'Enter') {
+        sendAIMessage();
+    }
+}
+
+/**
+ * Send message to AI and get response
+ */
+async function sendAIMessage() {
+    const input = document.getElementById('ai-input');
+    const messagesContainer = document.getElementById('ai-messages');
+    const userMessage = input.value.trim();
+    
+    if (!userMessage) return;
+    
+    // Add user message to chat
+    messagesContainer.innerHTML += `
+        <div class="ai-message user">
+            <div class="message-content">${escapeHtml(userMessage)}</div>
+        </div>
+    `;
+    
+    input.value = '';
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    
+    // Add typing indicator
+    const typingId = 'typing-' + Date.now();
+    messagesContainer.innerHTML += `
+        <div class="ai-message bot" id="${typingId}">
+            <div class="message-content typing-indicator">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+    `;
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    
+    try {
+        // Get current notices for context
+        const notices = window.appData.notifications || [];
+        const noticeContext = notices.slice(0, 10).map(n => 
+            `- ${n.title}: ${n.body} (Date: ${n.meta?.date || 'TBD'}, Location: ${n.meta?.location || 'TBD'})`
+        ).join('\n');
+        
+        const systemPrompt = `You are a helpful AI assistant for NMIMS Shirpur Campus. You help students with:
+1. Information about campus events and notices
+2. Summarizing notices
+3. Answering questions about campus life
+4. Helping draft new notices
+
+Here are the current campus notices:
+${noticeContext}
+
+Be friendly, concise, and helpful. Keep responses under 100 words unless asked for details.`;
+        
+        const response = await callGeminiAPI(systemPrompt, userMessage);
+        
+        // Remove typing indicator
+        document.getElementById(typingId)?.remove();
+        
+        // Add AI response
+        messagesContainer.innerHTML += `
+            <div class="ai-message bot">
+                <div class="message-content">${formatAIResponse(response)}</div>
+            </div>
+        `;
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        
+    } catch (error) {
+        console.error('AI Error:', error);
+        document.getElementById(typingId)?.remove();
+        
+        messagesContainer.innerHTML += `
+            <div class="ai-message bot">
+                <div class="message-content">Sorry, I encountered an error. Please try again later. 🙁</div>
+            </div>
+        `;
+    }
+}
+
+/**
+ * Call Gemini API
+ */
+async function callGeminiAPI(systemPrompt, userMessage) {
+    const response = await fetch(GEMINI_API_URL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            contents: [{
+                parts: [{
+                    text: `${systemPrompt}\n\nUser Question: ${userMessage}`
+                }]
+            }],
+            generationConfig: {
+                temperature: 0.7,
+                maxOutputTokens: 500,
+            }
+        })
+    });
+    
+    if (!response.ok) {
+        throw new Error('API request failed');
+    }
+    
+    const data = await response.json();
+    return data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response received.';
+}
+
+/**
+ * Escape HTML to prevent XSS
+ */
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+/**
+ * Format AI response with basic markdown
+ */
+function formatAIResponse(text) {
+    return escapeHtml(text)
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/\n/g, '<br>');
+}

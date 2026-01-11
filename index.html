@@ -290,6 +290,41 @@
         </div>
     </div>
 
+
+    <!-- AI Assistant Floating Button & Modal -->
+    <button class="ai-fab" onclick="toggleAIAssistant()" title="AI Campus Assistant">
+        <i class="fa-solid fa-robot"></i>
+    </button>
+
+    <div id="ai-modal" class="ai-modal">
+        <div class="ai-chat-container">
+            <div class="ai-chat-header">
+                <div class="ai-header-info">
+                    <i class="fa-solid fa-robot"></i>
+                    <span>Campus AI Assistant</span>
+                </div>
+                <button onclick="toggleAIAssistant()" class="ai-close-btn">
+                    <i class="fa-solid fa-times"></i>
+                </button>
+            </div>
+            <div class="ai-chat-messages" id="ai-messages">
+                <div class="ai-message bot">
+                    <div class="message-content">
+                        👋 Hi! I'm your NMIMS Campus Assistant powered by Gemini AI. Ask me anything about campus
+                        events, notices, or let me help you draft a new notice!
+                    </div>
+                </div>
+            </div>
+            <div class="ai-chat-input">
+                <input type="text" id="ai-input" placeholder="Ask about campus events..."
+                    onkeypress="handleAIKeyPress(event)">
+                <button onclick="sendAIMessage()" class="ai-send-btn">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script src="data.js"></script>
     <script src="script.js"></script>
 </body>
