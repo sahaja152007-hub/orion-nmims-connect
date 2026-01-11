@@ -169,6 +169,42 @@ const defaultNotifications = [
             posterLink: "#"
         }
     }
+    ,
+    // --- Expired / Missed Deadline Examples ---
+    {
+        id: 901,
+        title: "Guest Lecture: Blockchain Defaults",
+        body: "Introduction to Smart Contracts. Attendance Compulsory.",
+        timestamp: "5 days ago",
+        type: "academic",
+        urgency: "low",
+        tags: ["all", "tech"],
+        meta: {
+            date: "Jan 5, 2026", // Missed
+            deadline: "2026-01-05", // ISO format for logic
+            time: "10:00 AM",
+            location: "Seminar Hall",
+            regLink: "#",
+            posterLink: "#"
+        }
+    },
+    {
+        id: 902,
+        title: "Flash Mob Registration",
+        body: "Last day to sign up for the Flash Mob event.",
+        timestamp: "2 days ago",
+        type: "club",
+        urgency: "medium",
+        tags: ["clubs", "dance"],
+        meta: {
+            date: "Jan 9, 2026", // Missed recently
+            deadline: "2026-01-09",
+            time: "5:00 PM",
+            location: "Atrium",
+            regLink: "#",
+            posterLink: "#"
+        }
+    }
 ];
 
 // Relevance Rules
@@ -247,6 +283,20 @@ function getFilteredNotifications(currentGroup = "all", searchQuery = "") {
             const matchBody = note.body.toLowerCase().includes(query);
             if (!matchTitle && !matchBody) {
                 return null; // Eliminate irrelevant
+            }
+        }
+
+        // Deadline Clean-up Logic (Remove notices older than 2 days past deadline)
+        if (note.meta && note.meta.deadline) {
+            const deadlineDate = new Date(note.meta.deadline);
+            const today = new Date();
+            // Calculate difference in days
+            const diffTime = today - deadlineDate;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            // If more than 2 days passed since deadline, hide it
+            if (diffDays > 2) {
+                return null;
             }
         }
 
