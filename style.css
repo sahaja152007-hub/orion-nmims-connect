@@ -789,6 +789,7 @@ body {
     background: #ef4444;
     color: white;
 }
+
 /* Mobile Responsive */
 .hamburger-btn {
     display: none;
@@ -800,7 +801,7 @@ body {
     margin-right: 1rem;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 768px) {
     .app-container {
         grid-template-columns: 1fr;
     }
@@ -811,7 +812,8 @@ body {
 
     .sidebar {
         position: fixed;
-        left: -320px; /* Hide off-screen */
+        left: -320px;
+        /* Hide off-screen */
         top: 0;
         bottom: 0;
         width: 300px;
@@ -823,7 +825,7 @@ body {
 
     .sidebar.show-sidebar {
         left: 0;
-        box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+        box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
     }
 
     .main-content {
@@ -831,6 +833,6 @@ body {
     }
 
     .header-search {
-        display: none; 
+        display: none;
     }
 }
