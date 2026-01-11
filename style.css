@@ -698,48 +698,38 @@ body {
     color: white;
     font-size: 1.5rem;
     cursor: pointer;
+    margin-right: 1rem;
 }
 @media (max-width: 768px) {
     .app-container {
-        flex-direction: column;
-        height: auto;
-        /* Allow scroll on mobile */
+        grid-template-columns: 1fr;
+    }
+    .hamburger-btn {
+        display: block;
     }
     .sidebar {
-        width: 100%;
+        position: fixed;
+        left: -320px;
+        /* Hide off-screen */
+        top: 0;
+        bottom: 0;
+        width: 300px;
+        z-index: 1000;
+        transition: left 0.3s ease;
+        background: rgba(15, 23, 42, 0.95);
+        border-right: 1px solid var(--glass-border);
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 2rem;
+    }
+    .sidebar.show-sidebar {
+        left: 0;
+        box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
+    }
+    .main-content {
         padding: 1rem;
-        gap: 1rem;
-        border-right: none;
-        border-bottom: 1px solid var(--glass-border);
-    }
-    .feed-container {
-        padding: 1.5rem;
-    }
-    .feed-header h1 {
-        font-size: 1.5rem;
     }
     .header-search {
         display: none;
-        /* Can be a toggle for mobile */
-    }
-    .top-bar {
-        justify-content: flex-end;
-        padding-bottom: 1rem;
-    }
-    .profile-container {
-        grid-template-columns: 1fr;
-    }
-    .attendance-grid {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 2rem;
-    }
-    .status-card {
-        display: none;
-    }
-    .action-panel {
-        display: block;
-        margin-top: 1rem;
-        padding-top: 1rem;
     }
 }
